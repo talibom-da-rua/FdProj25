@@ -1,0 +1,33 @@
+# Sala 0.1
+# Grupo 99 - Exemplo
+
+#docas de saída de pratos e de estacionamento do robô
+
+Dock1 Rectangle(Point(62,150), Point(75,140))
+Dock2 Rectangle(Point(75,150), Point(88,140))
+
+#set de mesas da esquerda
+
+Table1 Rectangle(Point(22,110), Point(40,96))
+Table2 Rectangle(Point(22,82), Point(40,68))
+Table3 Rectangle(Point(22,54), Point(40,40))
+Table4 Rectangle(Point(44,110), Point(62,96))
+Table5 Rectangle(Point(44,82), Point(62,68))
+Table6 Rectangle(Point(44,54), Point(62,40))
+
+#separador da esquerda
+
+Divisiora Rectangle(Point(41,130), Point(43,20))
+
+#set de mesas da direita
+
+Table7 Rectangle(Point(110,110), Point(128,96))
+Table8 Rectangle(Point(110,82), Point(128,68))
+Table9 Rectangle(Point(110,54), Point(128,40))
+Table10 Rectangle(Point(88,110), Point(106,96))
+Table11 Rectangle(Point(88,82), Point(106,68))
+Table12 Rectangle(Point(88,54), Point(106,40))
+
+#separador da direita
+
+Divisiora2 Rectangle(Point(107,130), Point(109,20))

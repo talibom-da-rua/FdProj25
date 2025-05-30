@@ -1,0 +1,25 @@
+from graphics import *
+
+class Waiter:
+    def __init__(self, win, start_pos):
+
+        self.win = win
+        self.pos = Point(*start_pos)
+        self.start_pos = Point(*start_pos)
+        self.shape = Circle(self.pos, 5)
+        self.shape.setFill("red")
+        self.shape.draw(win)
+
+    def move(self, destino):
+        # Move the waiter to the new position
+        dx = destino.getX() - self.pos.getX()
+        dy = destino.getY() - self.pos.getY()
+        self.shape.move(dx, dy)
+        self.pos = destino
+    
+    def voltar(self):
+        # Move the waiter back to the starting position
+        dx = self.start_pos.getX() - self.pos.getX()
+        dy = self.start_pos.getY() - self.pos.getY()
+        self.shape.move(dx, dy)
+        self.pos = self.start_pos

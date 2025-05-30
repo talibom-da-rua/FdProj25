@@ -62,13 +62,13 @@ def desenhar_objetos(objetos, win):
         forma.draw(win)
 
 def main():
-    largura_logica = 1600
-    altura_logica = 1200
+    largura_logica = 150
+    altura_logica = 150
 
-    win = GraphWin("Sala do Restaurante", 800, 600)
+    win = GraphWin("Sala do Restaurante", 600, 600)
     win.setCoords(0, 0, largura_logica, altura_logica)
 
-    objetos = ler_ficheiro_planta("sala01.txt")
+    objetos = ler_ficheiro_planta("salaxx.txt")
     desenhar_objetos(objetos, win)
 
     # Espera por um clique para fechar
