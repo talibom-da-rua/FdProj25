@@ -3,8 +3,8 @@
 
 #docas de saída de pratos e de estacionamento do robô
 
-Dock1 Rectangle(Point(62,150), Point(75,140))
-Dock2 Rectangle(Point(75,150), Point(88,140))
+Dock1 Rectangle(Point(62,150), Point(88,140))
+Dock2 Rectangle(Point(88,140), Point(98,150))
 
 #set de mesas da esquerda
 

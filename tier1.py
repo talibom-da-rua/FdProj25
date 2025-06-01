@@ -7,6 +7,7 @@ Created on Thu May 22 18:23:31 2025
 """
 
 from graphics import GraphWin, Rectangle, Oval, Point
+from waiter import Waiter
 
 def ler_ficheiro_planta(caminho):
     objetos = []
@@ -70,6 +71,12 @@ def main():
 
     objetos = ler_ficheiro_planta("salaxx.txt")
     desenhar_objetos(objetos, win)
+
+    waiter = Waiter(win, (93, 145))  # Posição inicial do garçom
+
+    destino = Point(50, 50)  # Posição de destino do garçom
+    waiter.move_to(destino)  # Move o garçom para a posição de destino
+    waiter.voltar()  # Move o garçom de volta para a posição inicial
 
     # Espera por um clique para fechar
     win.getMouse()
