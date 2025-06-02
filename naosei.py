@@ -57,30 +57,57 @@ def desenhar_objetos(objetos, win):
 # ===============================
 # Função: Obter os centros das mesas
 # ===============================
-def obter_centros_das_mesas(objetos):
-    centros = []
+def obter_destinos_das_mesas(objetos):
+    destinos = []
     for obj in objetos:
-        if "table" in obj['nome'].lower():  # <-- correção aqui
+        if "table" in obj['nome'].lower():
             x1, y1 = obj['p1']
             x2, y2 = obj['p2']
             centro_x = (x1 + x2) / 2
             centro_y = (y1 + y2) / 2
-            centros.append(Point(centro_x, centro_y))
-    return centros
+
+            # Aproximação: posicionar destino um pouco acima da mesa
+            destino = Point(centro_x, max(y1, y2) + 2)
+            destinos.append(destino)
+    return destinos
+
 
 # ===============================
-# Função: Verificar colisão com obstáculos
+# Função: Obter obstáculos como grelha
 # ===============================
-def esta_em_colisao(ponto, objetos):
-    x = ponto.getX()
-    y = ponto.getY()
+def obter_obstaculos_em_grelha(objetos):
+    obstaculos = set()
     for obj in objetos:
-        if obj['tipo'] == 'Rectangle' and ("table" in obj['nome'].lower() or "divisiora" in obj['nome'].lower()):
+        if obj['tipo'] == 'Rectangle' and ("table" in obj['nome'].lower() or "divisoria" in obj['nome'].lower()):
             x1, y1 = obj['p1']
             x2, y2 = obj['p2']
-            if min(x1, x2) <= x <= max(x1, x2) and min(y1, y2) <= y <= max(y1, y2):
-                return True
-    return False
+            for x in range(min(x1, x2), max(x1, x2)+1):
+                for y in range(min(y1, y2), max(y1, y2)+1):
+                    obstaculos.add((x, y))
+    return obstaculos
+
+# ===============================
+# Função: Busca em Largura (BFS)
+# ===============================
+def bfs(start, goal, obstacles, largura, altura):
+    queue = deque()
+    queue.append((start, [start]))
+    visited = set()
+    visited.add(start)
+
+    moves = [(-1,0), (1,0), (0,-1), (0,1)]
+
+    while queue:
+        (x, y), path = queue.popleft()
+        if (x, y) == goal:
+            return path
+
+        for dx, dy in moves:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < largura and 0 <= ny < altura and (nx, ny) not in visited and (nx, ny) not in obstacles:
+                queue.append(((nx, ny), path + [(nx, ny)]))
+                visited.add((nx, ny))
+    return None
 
 # ===============================
 # Classe: Waiter
@@ -101,70 +128,23 @@ class Waiter:
         self.forma.setOutline("black")
         self.forma.draw(win)
 
-    def mover_com_desvio(self, destino, win, objetos):
-        passo = 2
-        atual = self.posicao_atual
+    def mover_com_bfs(self, destino, win, objetos, largura, altura):
+        start = (int(round(self.posicao_atual.getX())), int(round(self.posicao_atual.getY())))
+        end = (int(round(destino.getX())), int(round(destino.getY())))
+        obstaculos = obter_obstaculos_em_grelha(objetos)
 
-        while abs(atual.getX() - destino.getX()) >= passo or abs(atual.getY() - destino.getY()) >= passo:
-            if abs(destino.getX() - atual.getX()) >= passo:
-                inc_x = passo if destino.getX() > atual.getX() else -passo
-                proximo = Point(atual.getX() + inc_x, atual.getY())
-            elif abs(destino.getY() - atual.getY()) >= passo:
-                inc_y = passo if destino.getY() > atual.getY() else -passo
-                proximo = Point(atual.getX(), atual.getY() + inc_y)
-            else:
-                break
+        caminho = bfs(start, end, obstaculos, largura, altura)
+        if not caminho:
+            print("Sem caminho para o destino!")
+            return
 
-            if not esta_em_colisao(proximo, objetos):
-                desloca_x = proximo.getX() - atual.getX()
-                desloca_y = proximo.getY() - atual.getY()
-                self.forma.move(desloca_x, desloca_y)
-                self.posicao_atual = proximo
-                atual = proximo
-                win.update()
-            else:
-                # Tenta desviar no eixo contrário
-                if abs(destino.getY() - atual.getY()) >= passo:
-                    desvio = passo if destino.getY() > atual.getY() else -passo
-                    tentativa = Point(atual.getX(), atual.getY() + desvio)
-                else:
-                    desvio = passo if destino.getX() > atual.getX() else -passo
-                    tentativa = Point(atual.getX() + desvio, atual.getY())
-
-                if not esta_em_colisao(tentativa, objetos):
-                    desloca_x = tentativa.getX() - atual.getX()
-                    desloca_y = tentativa.getY() - atual.getY()
-                    self.forma.move(desloca_x, desloca_y)
-                    self.posicao_atual = tentativa
-                    atual = tentativa
-                    win.update()
-                else:
-                    break  # preso
-
-# ===============================
-# Função: Busca em Largura (BFS)
-# ===============================
-def bfs(start, goal, obstacles, largura, altura):
-    """Procura caminho do start ao goal evitando obstáculos usando BFS."""
-    queue = deque()
-    queue.append((start, [start]))
-    visited = set()
-    visited.add(start)
-
-    # Movimentos possíveis: cima, baixo, esquerda, direita
-    moves = [(-1,0), (1,0), (0,-1), (0,1)]
-
-    while queue:
-        (x, y), path = queue.popleft()
-        if (x, y) == goal:
-            return path
-
-        for dx, dy in moves:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < largura and 0 <= ny < altura and (nx, ny) not in visited and (nx, ny) not in obstacles:
-                queue.append(((nx, ny), path + [(nx, ny)]))
-                visited.add((nx, ny))
-    return None  # Sem caminho
+        for px, py in caminho[1:]:
+            proximo = Point(px, py)
+            desloca_x = proximo.getX() - self.posicao_atual.getX()
+            desloca_y = proximo.getY() - self.posicao_atual.getY()
+            self.forma.move(desloca_x, desloca_y)
+            self.posicao_atual = proximo
+            win.update()
 
 # ===============================
 # Função principal
@@ -190,11 +170,17 @@ def main():
     empregado.desenhar(win)
 
     for centro in centros:
-        empregado.mover_com_desvio(centro, win, objetos)
-        empregado.mover_com_desvio(empregado.ponto_inicial, win, objetos)
-    win.getMouse()  # <-- Adiciona esta linha
-    win.getMouse()  # <-- Adiciona esta linha
-    win.close()     # <-- E esta
+        empregado.mover_com_bfs(centro, win, objetos, largura_logica, altura_logica)
+        empregado.mover_com_bfs(empregado.ponto_inicial, win, objetos, largura_logica, altura_logica)
+        destinos = obter_destinos_das_mesas(objetos)
+    for d in destinos:
+        circulo = Circle(d, 1)
+        circulo.setFill("red")
+        circulo.draw(win)
+
+    win.getMouse()
+    win.getMouse()
+    win.close()
 
 if __name__ == "__main__":
     main()
