@@ -1,8 +1,0 @@
-# Tamanho da janela: 800 600
-# Grupo 99
-
-Dock1 Rectangle(Point(0,0), Point(80,60))
-Dock2 Rectangle(Point(1520,1140), Point(1600,1200))
-Table1 Rectangle(Point(200,300), Point(300,400))
-Table2 Rectangle(Point(400,300), Point(500,400))
-Divisoria Rectangle(Point(350,0), Point(360,600))

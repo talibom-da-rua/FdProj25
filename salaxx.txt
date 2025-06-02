@@ -17,7 +17,7 @@ Table6 Rectangle(Point(44,54), Point(62,40))
 
 #separador da esquerda
 
-Divisiora Rectangle(Point(41,130), Point(43,20))
+Divisoria Rectangle(Point(41,130), Point(43,20))
 
 #set de mesas da direita
 
@@ -30,4 +30,4 @@ Table12 Rectangle(Point(88,54), Point(106,40))
 
 #separador da direita
 
-Divisiora2 Rectangle(Point(107,130), Point(109,20))
+Divisoria2 Rectangle(Point(107,130), Point(109,20))

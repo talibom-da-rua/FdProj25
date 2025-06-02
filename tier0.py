@@ -6,7 +6,16 @@ Created on Thu May 22 18:23:31 2025
 @author: stelafernandes
 """
 
-from graphics import GraphWin, Rectangle, Oval, Point
+from graphics import GraphWin, Rectangle, Point
+
+def extrair_categoria_e_numero(nome):
+    i = 0
+    while i < len(nome) and nome[i].isalpha():
+        i += 1
+    categoria = nome[:i]
+    numero_str = nome[i:]
+    numero = int(numero_str) if numero_str.isdigit() else None
+    return categoria, numero
 
 def ler_ficheiro_planta(caminho):
     objetos = []
@@ -22,25 +31,22 @@ def ler_ficheiro_planta(caminho):
                 continue
 
             nome = partes[0]
-            # Extrair tipo: antes do primeiro '(' na segunda parte
+            categoria, numero = extrair_categoria_e_numero(nome)
             tipo = partes[1].split('(')[0]
 
-            # Extrair a parte que contém os pontos (juntando partes[1:] para garantir)
-            pontos_str = ' '.join(partes[1:])
-            # Agora pontos_str é algo como: "Rectangle(Point(0,0), Point(80,60))"
-            
-            # Encontrar os dois Point(...)
             import re
+            pontos_str = ' '.join(partes[1:])
             pontos = re.findall(r'Point\((\d+),(\d+)\)', pontos_str)
             if len(pontos) != 2:
                 print(f"Linha ignorada por não ter exatamente 2 pontos: {linha}")
                 continue
-            
+
             p1x, p1y = map(int, pontos[0])
             p2x, p2y = map(int, pontos[1])
 
             objeto = {
                 'nome': nome,
+                'categoria': categoria,
                 'tipo': tipo,
                 'p1': (p1x, p1y),
                 'p2': (p2x, p2y)
@@ -97,7 +103,35 @@ def main():
 
 
     # Espera por um clique para fechar
-    win.getMouse()
+    receive_click(win, objetos)
     win.close()
 
-main()
+def is_object(x, y, objetos):
+    for obj in objetos:
+        x1, y1 = obj['p1']
+        x2, y2 = obj['p2']
+        if min(x1, x2) <= x <= max(x1, x2) and min(y1, y2) <= y <= max(y1, y2):
+            return obj['categoria'], obj['nome']
+    return None, None  # Só identifica
+
+def receive_click(win, objetos):
+    while True:
+        click_point = win.getMouse()
+        x = click_point.getX()
+        y = click_point.getY()
+        categoria, nome = is_object(x, y, objetos)
+        if categoria == "Table":
+            _, numero = extrair_categoria_e_numero(nome)
+            return numero
+        elif categoria == "Dock" or categoria == "Divisoria":
+            continue
+        elif categoria is None:
+            obstáculo(win, x, y)  # Só aqui desenhas a mancha
+
+
+def obstáculo(win, x, y):
+
+    centro_imagem = Point(x, y)
+    stain = Image(centro_imagem, "stain.gif")
+    stain.draw(win)
+
