@@ -6,7 +6,8 @@ Created on Thu May 22 18:23:31 2025
 @author: stelafernandes
 """
 
-from graphics import GraphWin, Rectangle, Point
+from graphics import GraphWin, Rectangle, Point, Image, Circle, Oval
+from time import sleep
 
 def extrair_categoria_e_numero(nome):
     i = 0
@@ -67,24 +68,30 @@ def desenhar_objetos(objetos, win):
         forma.setFill("lightgrey")
         forma.draw(win)
         
-from graphics import Circle
-
 class Waiter:
-    def __init__(self, ponto_inicial, cor="blue", raio=20):
-        self.ponto_inicial = ponto_inicial
-        self.posicao_atual = ponto_inicial
-        self.cor = cor
-        self.raio = raio
-        self.forma = None
+    def __init__(self, win, start_pos):
+        self.win = win
+        self.pos = Point(*start_pos)
+        self.start_pos = Point(*start_pos)
+        self.shape = Circle(self.pos, 4)
+        self.shape.setFill("red")
+        self.shape.draw(win)
 
-    def desenhar(self, win):
-        if self.forma:
-            self.forma.undraw()
-        self.forma = Circle(self.posicao_atual, self.raio)
-        self.forma.setFill(self.cor)
-        self.forma.setOutline("black")
-        self.forma.draw(win)
+    def move_to(self, destino):
+        dx = (destino.getX() - self.pos.getX()) / 100
+        dy = (destino.getY() - self.pos.getY()) / 100
+        for _ in range(100):
+            self.shape.move(dx, dy)
+            self.pos.move(dx, dy)
+            sleep(0.01)
 
+    def voltar(self):
+        dx = (self.start_pos.getX() - self.pos.getX()) / 100
+        dy = (self.start_pos.getY() - self.pos.getY()) / 100
+        for _ in range(100):
+            self.shape.move(dx, dy)
+            self.pos.move(dx, dy)
+            sleep(0.01)
 
 def main():
     largura_logica = 150
@@ -96,14 +103,9 @@ def main():
     objetos = ler_ficheiro_planta("salaxx.txt")
     desenhar_objetos(objetos, win)
     
-    # Criar e desenhar o empregado no ponto inicial
-    ponto_inicial = Point(68.5, 145)  # centro do Dock1
-    empregado = Waiter(ponto_inicial, raio=4)
-    empregado.desenhar(win)
+    empregado = Waiter(win, (68.5, 145))
 
-
-    # Espera por um clique para fechar
-    receive_click(win, objetos)
+    mesa = receive_click(win, objetos)
     win.close()
 
 def is_object(x, y, objetos):
@@ -135,3 +137,5 @@ def obstáculo(win, x, y):
     stain = Image(centro_imagem, "stain.gif")
     stain.draw(win)
 
+if __name__ == "__main__":
+    main()
